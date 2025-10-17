@@ -1,0 +1,13 @@
+# EMPLOYEE PERFORMANCE TRACKING SYSTEM
+
+Folder Structure:
+
+employee_performance_tracker/
+│
+├── app.py                     # Streamlit UI
+├── db_connections.py          # Handles SQLite + MongoDB connections
+├── employee_manager.py        # SQL CRUD for employees
+├── project_manager.py         # SQL CRUD + employee-project assignment
+├── performance_reviewer.py    # NoSQL CRUD (MongoDB)
+├── reports.py                 # Combines SQL + NoSQL for analytics
+└── company.db                 # SQLite database (auto-created)
