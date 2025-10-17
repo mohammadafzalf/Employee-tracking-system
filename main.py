@@ -1,9 +1,24 @@
 # app.py
 import streamlit as st
 from datetime import date
+import pandas as pd
 
+# Import all backend functions
+from employee_manager import (
+    add_employee, get_employee_by_id, list_all_employees
+)
+from project_manager import (
+    add_project, assign_employee_to_project, get_projects_for_employee
+)
+from performance_reviewer import (
+    submit_performance_review, get_performance_reviews_for_employee
+)
+from reports import (
+    generate_employee_project_report, generate_employee_performance_summary
+)
+
+# Streamlit Page Config
 st.set_page_config(page_title="Employee Performance Tracker", layout="wide")
-
 st.title("🏢 Employee Performance Tracking System")
 
 # Sidebar Menu
@@ -16,11 +31,14 @@ menu = st.sidebar.radio(
         "Submit Performance Review",
         "View Employee Projects",
         "View Employee Performance",
-        "Generate Reports"
+        "Generate Reports",
+        "View All Employees"
     ]
 )
 
-# --- Add Employee ---
+# ==========================
+# 1️⃣ Add Employee
+# ==========================
 if menu == "Add Employee":
     st.header("➕ Add New Employee")
     first_name = st.text_input("First Name")
@@ -30,23 +48,32 @@ if menu == "Add Employee":
     department = st.text_input("Department")
 
     if st.button("Add Employee"):
-        # Placeholder for database function
-        # add_employee(first_name, last_name, email, hire_date, department)
-        st.success(f"Employee '{first_name} {last_name}' added successfully!")
+        success, msg = add_employee(first_name, last_name, email, str(hire_date), department)
+        if success:
+            st.success(msg)
+        else:
+            st.error(msg)
 
-# --- Add Project ---
+# ==========================
+# 2️⃣ Add Project
+# ==========================
 elif menu == "Add Project":
     st.header("📁 Add New Project")
     project_name = st.text_input("Project Name")
     start_date = st.date_input("Start Date", value=date.today())
-    end_date = st.date_input("End Date (optional)", value=None)
+    end_date = st.text_input("End Date (optional)")
     status = st.selectbox("Status", ["Planning", "Ongoing", "Completed"])
 
     if st.button("Add Project"):
-        # add_project(project_name, start_date, end_date, status)
-        st.success(f"Project '{project_name}' added successfully!")
+        success, msg = add_project(project_name, str(start_date), end_date, status)
+        if success:
+            st.success(msg)
+        else:
+            st.error(msg)
 
-# --- Assign Employee to Project ---
+# ==========================
+# 3️⃣ Assign Employee to Project
+# ==========================
 elif menu == "Assign Employee to Project":
     st.header("👥 Assign Employee to Project")
     employee_id = st.number_input("Employee ID", min_value=1)
@@ -54,10 +81,15 @@ elif menu == "Assign Employee to Project":
     role = st.text_input("Role")
 
     if st.button("Assign"):
-        # assign_employee_to_project(employee_id, project_id, role)
-        st.success(f"Employee {employee_id} assigned to Project {project_id} as {role}")
+        success, msg = assign_employee_to_project(employee_id, project_id, role)
+        if success:
+            st.success(msg)
+        else:
+            st.error(msg)
 
-# --- Submit Performance Review ---
+# ==========================
+# 4️⃣ Submit Performance Review
+# ==========================
 elif menu == "Submit Performance Review":
     st.header("📝 Submit Performance Review")
     employee_id = st.number_input("Employee ID", min_value=1)
@@ -70,39 +102,81 @@ elif menu == "Submit Performance Review":
     goals_for_next_period = st.text_area("Goals for Next Period")
 
     if st.button("Submit Review"):
-        # submit_performance_review(employee_id, review_date, reviewer_name, overall_rating, strengths, areas_for_improvement, comments, goals_for_next_period)
-        st.success(f"Review submitted successfully for Employee {employee_id}")
+        success, msg = submit_performance_review(
+            employee_id, str(review_date), reviewer_name, overall_rating,
+            strengths, areas_for_improvement, comments, goals_for_next_period
+        )
+        if success:
+            st.success(msg)
+        else:
+            st.error(msg)
 
-# --- View Employee Projects ---
+# ==========================
+# 5️⃣ View Employee Projects
+# ==========================
 elif menu == "View Employee Projects":
     st.header("📋 View Projects for Employee")
     employee_id = st.number_input("Enter Employee ID", min_value=1)
     if st.button("Fetch Projects"):
-        # projects = get_projects_for_employee(employee_id)
-        # st.table(projects)
-        st.info("Projects displayed here (coming soon)")
+        projects = get_projects_for_employee(employee_id)
+        if projects:
+            df = pd.DataFrame(projects, columns=["Project Name", "Role", "Assigned Date"])
+            st.dataframe(df)
+        else:
+            st.info("No projects found for this employee.")
 
-# --- View Employee Performance ---
+# ==========================
+# 6️⃣ View Employee Performance
+# ==========================
 elif menu == "View Employee Performance":
     st.header("📊 View Employee Performance")
     employee_id = st.number_input("Enter Employee ID", min_value=1)
     if st.button("Fetch Performance"):
-        # reviews = get_performance_reviews_for_employee(employee_id)
-        # st.table(reviews)
-        st.info("Performance data displayed here (coming soon)")
+        reviews = get_performance_reviews_for_employee(employee_id)
+        if reviews:
+            df = pd.DataFrame(reviews)
+            st.dataframe(df)
+        else:
+            st.warning("No performance reviews found for this employee.")
 
-# --- Generate Reports ---
+# ==========================
+# 7️⃣ Generate Reports
+# ==========================
 elif menu == "Generate Reports":
     st.header("📈 Generate Reports")
     report_type = st.selectbox("Select Report Type", ["Employee-Project Report", "Performance Summary"])
 
     if report_type == "Employee-Project Report":
         if st.button("Generate"):
-            # generate_employee_project_report()
-            st.info("Employee-Project report generated (coming soon)")
+            data = generate_employee_project_report()
+            if data:
+                df = pd.DataFrame(data, columns=["Employee", "Project", "Role", "Assigned Date"])
+                st.dataframe(df)
+            else:
+                st.info("No report data available.")
 
     elif report_type == "Performance Summary":
         emp_id = st.number_input("Enter Employee ID for Summary", min_value=1)
         if st.button("Generate Summary"):
-            # generate_employee_performance_summary(emp_id)
-            st.info("Performance Summary displayed here (coming soon)")
+            summary = generate_employee_performance_summary(emp_id)
+            if isinstance(summary, dict):
+                st.subheader(f"Performance Summary for {summary['Employee']}")
+                st.write(f"⭐ Average Rating: {summary['Average Rating']}")
+                st.write("### Strengths")
+                st.write("\n".join(summary['Strengths']))
+                st.write("### Areas for Improvement")
+                st.write("\n".join(summary['Areas for Improvement']))
+            else:
+                st.info(summary)
+
+# ==========================
+# 8️⃣ View All Employees
+# ==========================
+elif menu == "View All Employees":
+    st.header("👨‍💼 All Employees")
+    employees = list_all_employees()
+    if employees:
+        df = pd.DataFrame(employees, columns=["ID", "First Name", "Last Name", "Email", "Hire Date", "Department"])
+        st.dataframe(df)
+    else:
+        st.warning("No employees found.")
