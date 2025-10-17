@@ -23,10 +23,10 @@ def get_sql_connection():
 def get_mongo_connection():
     try:
         print(mongo_connection_string)
-        mongo_client = MongoClient("mongo_connection_string")
-        db = mongo_client["performance_reviews_db"]
-        collection = db["reviews"]
-        return mongo_client,collection
+        mongo_client = MongoClient(mongo_connection_string)  # Just removing the double inverted comma
+        #db = mongo_client["performance_reviews_db"]
+        #collection = db["reviews"]
+        return mongo_client  # just trying to check if the get performance work if I remove mongo_client(mongo_client,)
     except Exception as e:
         print("Failed to connect to MongoDB: ", e)
         

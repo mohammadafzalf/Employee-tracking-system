@@ -4,7 +4,9 @@ from db_connections import get_mongo_connection
 def submit_performance_review(employee_id, review_date, reviewer_name,
                               overall_rating, strengths, areas_for_improvement,
                               comments, goals_for_next_period):
-    collection = get_mongo_connection()
+    mongo_client = get_mongo_connection()
+    db = mongo_client["performance_reviews_db"]
+    collection = db["reviews"]
     review_doc = {
         "employee_id": employee_id,
         "review_date": str(review_date),
@@ -23,6 +25,8 @@ def submit_performance_review(employee_id, review_date, reviewer_name,
 
 
 def get_performance_reviews_for_employee(employee_id):
-    collection = get_mongo_connection()
+    mongo_client = get_mongo_connection()
+    db = mongo_client["performance_reviews_db"]
+    collection = db["reviews"]
     reviews = list(collection.find({"employee_id": employee_id}, {"_id": 0}))
     return reviews
