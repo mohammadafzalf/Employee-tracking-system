@@ -92,3 +92,5 @@ def initialize_database():
     
 
 initialize_database()
+
+# mongodb+srv://harshavardhan21627:XVbEOP8WxauFJRFj@employeecrm.o432z0m.mongodb.net/

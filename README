@@ -11,3 +11,17 @@ employee_performance_tracker/
 ├── performance_reviewer.py    # NoSQL CRUD (MongoDB)
 ├── reports.py                 # Combines SQL + NoSQL for analytics
 └── company.db                 # SQLite database (auto-created)
+
+
+#Roles and Responsibilities:
+| Functionality                         | HR Access | Team Lead Access |
+| ------------------------------------- | :-------: | :--------------: |
+| Add New Employee                      |     ✅     |         ❌        |
+| View Employee Details / All Employees |     ✅     |         ❌        |
+| Add New Project                       |     ❌     |         ✅        |
+| Assign Employee to Project            |     ❌     |         ✅        |
+| Submit Performance Review             |     ❌     |         ✅        |
+| View Employee Projects                |     ❌     |         ✅        |
+| View Employee Performance             |     ✅     |         ✅        |
+| Generate Reports                      |     ✅     |         ✅        |
+
